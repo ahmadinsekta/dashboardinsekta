@@ -1,98 +1,58 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // assets
-import { FiLayers } from "react-icons/fi";
+import { FiBriefcase } from "react-icons/fi";
+import KartunInsekta from "../../assets/kartun-tim-insekta.webp";
 
-// components
-import DashboardHeader from "./DashboardHeader";
-import FeatureCard from "./FeatureCard";
-import FilePreviewModal from "./FilePreviewModal";
-import PromotionSlider from "../../components/PromotionSlider";
-import PageLoader from "../../components/PageLoader";
+const DashboardHeader = () => {
+  const { userInfo } = useSelector((state) => state.auth);
 
-// features
-import featureService from "../../services/featureService";
-import { isPreviewable } from "../../utils/urlHelper";
-
-const ClientDashboard = () => {
-  const navigate = useNavigate();
-  const [features, setFeatures] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // State Modal Preview
-  const [previewData, setPreviewData] = useState(null);
-
-  useEffect(() => {
-    const fetchMyFeatures = async () => {
-      try {
-        const data = await featureService.getMyFeatures();
-        setFeatures(data);
-      } catch (error) {
-        console.error("Gagal load menu", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchMyFeatures();
-  }, []);
-
-  const handleMenuClick = (feature) => {
-    if (feature.type === "folder") {
-      navigate(`/dashboard/folder/${feature._id}`, { state: { feature } });
-    } else {
-      if (isPreviewable(feature.url)) {
-        setPreviewData({ title: feature.title, url: feature.url });
-      } else {
-        window.open(feature.url, "_blank");
-      }
-    }
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "Selamat Pagi";
+    if (hour < 15) return "Selamat Siang";
+    if (hour < 19) return "Selamat Sore";
+    return "Selamat Malam";
   };
 
-  if (isLoading) return <PageLoader />;
-
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20 animate-fade-in">
-      <div className="max-w-6xl mx-auto px-4 pt-0">
-        <DashboardHeader />
+    <div className="relative w-full bg-linear-to-r from-[#093050] to-blue-800 rounded-2xl shadow-xl mb-4 overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-20 w-40 h-40 bg-blue-400 opacity-10 rounded-full blur-2xl pointer-events-none"></div>
 
-        <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-blue-100 text-blue-700 rounded-lg">
-            <FiLayers size={20} />
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 md:p-8 md:min-h-72">
+        <div className="w-full md:w-2/3 space-y-2 text-center md:text-left z-20">
+          <div className="inline-block px-3 py-1 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full text-[#feba12] text-[10px] font-bold tracking-widest uppercase mb-2">
+            Insekta - Pest & Termite Control
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-gray-800">Menu Dashboard</h2>
-            <p className="text-xs text-gray-500">Akses fitur yang tersedia untuk Anda</p>
+
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
+            {getGreeting()},{" "}
+            <span className="text-[#feba12]">{userInfo?.name?.split(" ")[0]}!</span>
+          </h1>
+
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-4 text-blue-100 text-sm md:text-lg mt-1">
+            <span className="flex items-center gap-1.5 bg-blue-600/30 px-2 py-1 rounded-md">
+              <FiBriefcase className="text-[#feba12]" />
+              {userInfo?.companyName || "Client Area"}
+            </span>
           </div>
+
+          <p className="text-sm text-blue-50 opacity-80 leading-relaxed max-w-lg pt-2 md:block">
+            Dashboard Pengendalian Hama PT Insekta Fokustama
+          </p>
         </div>
 
-        {features.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200 shadow-sm">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-              <FiLayers size={32} />
-            </div>
-            <h3 className="font-bold text-gray-600">Belum ada menu aktif</h3>
-            <p className="text-gray-400 text-sm">Silakan hubungi admin.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {features.map((feat) => (
-              <FeatureCard key={feat._id} feature={feat} onClick={handleMenuClick} />
-            ))}
-          </div>
-        )}
-
-        <PromotionSlider />
+        <div className="hidden md:flex relative md:mt-6 md:absolute md:bottom-0 md:right-6 pointer-events-none">
+          <img
+            src={KartunInsekta}
+            alt="Insekta Mascot"
+            className="w-60 h-60 md:w-96 md:h-96 object-contain object-bottom drop-shadow-2xl filter brightness-110"
+          />
+        </div>
       </div>
-
-      <FilePreviewModal
-        isOpen={!!previewData}
-        onClose={() => setPreviewData(null)}
-        title={previewData?.title}
-        url={previewData?.url}
-      />
     </div>
   );
 };
 
-export default ClientDashboard;
+export default DashboardHeader;
