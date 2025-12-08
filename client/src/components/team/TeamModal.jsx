@@ -273,6 +273,9 @@ const TeamModal = ({ isOpen, type, onClose, onSubmit, initialData, areaList }) =
                     <option>Teknisi</option>
                     <option>Supervisor</option>
                     <option>Admin</option>
+                    <option>Quality Control</option>
+                    <option>Quality Assurance</option>
+                    <option>Tim Support</option>
                     <option>Manager</option>
                   </select>
                 </div>
